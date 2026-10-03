@@ -1,0 +1,42 @@
+[
+  {"name": "Margherita Pizza", "price": 199, "rating": 4.5},
+  {"name": "Farmhouse Pizza", "price": 249, "rating": 4.6},
+  {"name": "Paneer Tikka Pizza", "price": 269, "rating": 4.7},
+  {"name": "Chicken Dominator Pizza", "price": 299, "rating": 4.8},
+
+  {"name": "Veg Burger", "price": 99, "rating": 4.2},
+  {"name": "Cheese Veg Burger", "price": 119, "rating": 4.3},
+  {"name": "Chicken Burger", "price": 129, "rating": 4.4},
+  {"name": "Double Chicken Burger", "price": 159, "rating": 4.6},
+
+  {"name": "White Sauce Pasta", "price": 149, "rating": 4.3},
+  {"name": "Red Sauce Pasta", "price": 139, "rating": 4.2},
+  {"name": "Chicken Pasta", "price": 169, "rating": 4.5},
+
+  {"name": "Veg Sandwich", "price": 79, "rating": 4.1},
+  {"name": "Grilled Cheese Sandwich", "price": 109, "rating": 4.3},
+  {"name": "Chicken Sandwich", "price": 129, "rating": 4.4},
+
+  {"name": "French Fries", "price": 89, "rating": 4.2},
+  {"name": "Peri Peri Fries", "price": 109, "rating": 4.4},
+  {"name": "Cheese Loaded Fries", "price": 129, "rating": 4.5},
+
+  {"name": "Cold Coffee", "price": 99, "rating": 4.6},
+  {"name": "Cappuccino", "price": 119, "rating": 4.7},
+  {"name": "Latte", "price": 129, "rating": 4.6},
+  {"name": "Chocolate Shake", "price": 149, "rating": 4.8},
+  {"name": "Strawberry Shake", "price": 139, "rating": 4.6},
+  {"name": "Oreo Shake", "price": 159, "rating": 4.9},
+
+  {"name": "Lemon Iced Tea", "price": 99, "rating": 4.4},
+  {"name": "Peach Iced Tea", "price": 109, "rating": 4.5},
+  {"name": "Mojito", "price": 119, "rating": 4.6},
+
+  {"name": "Mineral Water", "price": 20, "rating": 4.0},
+  {"name": "Coca Cola", "price": 40, "rating": 4.3},
+  {"name": "Sprite", "price": 40, "rating": 4.2},
+
+  {"name": "Brownie", "price": 89, "rating": 4.5},
+  {"name": "Ice Cream Sundae", "price": 129, "rating": 4.7}
+
+]

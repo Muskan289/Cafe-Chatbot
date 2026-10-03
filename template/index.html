@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Café Chat</title>
+  <link to="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --cream:    #faf6f0;
+      --parchment:#f2ebe0;
+      --espresso: #2c1a0e;
+      --mocha:    #5c3d2e;
+      --caramel:  #c8843a;
+      --gold:     #e8b86d;
+      --foam:     #fffdf8;
+      --shadow:   rgba(44,26,14,0.12);
+    }
+
+    body {
+      background: var(--cream);
+      font-family: 'DM Sans', sans-serif;
+      height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    /* — background grain — */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image:
+        radial-gradient(ellipse 80% 60% at 20% 10%, rgba(200,132,58,.18) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 80% at 85% 90%, rgba(92,61,46,.15) 0%, transparent 60%),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ========= CHAT WINDOW ========= */
+    .window {
+      position: relative; z-index: 1;
+      width: min(480px, 96vw);
+      height: min(780px, 96dvh);
+      display: flex; flex-direction: column;
+      background: var(--foam);
+      border-radius: 28px;
+      box-shadow:
+        0 2px 0 rgba(255,255,255,.9) inset,
+        0 32px 80px rgba(44,26,14,.18),
+        0 4px 16px rgba(44,26,14,.10);
+      overflow: hidden;
+      animation: rise .6s cubic-bezier(.22,1,.36,1) both;
+    }
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(24px) scale(.97); }
+      to   { opacity: 1; transform: none; }
+    }
+
+    /* ========= HEADER ========= */
+    header {
+      padding: 22px 26px 18px;
+      background: var(--espresso);
+      position: relative;
+      flex-shrink: 0;
+      display: flex; align-items: center; gap: 14px;
+    }
+    header::after {
+      content: '';
+      position: absolute; bottom: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, var(--caramel), var(--gold), var(--caramel));
+    }
+
+    .avatar {
+      width: 46px; height: 46px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--caramel), var(--gold));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; flex-shrink: 0;
+      box-shadow: 0 0 0 3px rgba(232,184,109,.25);
+    }
+    .header-text { flex: 1; min-width: 0; }
+    .header-text h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.25rem; font-weight: 700;
+      color: var(--gold); letter-spacing: .01em;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .header-text p {
+      font-size: .72rem; color: rgba(232,184,109,.6);
+      letter-spacing: .06em; text-transform: uppercase; margin-top: 1px;
+    }
+    .status-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: #5cde7a;
+      box-shadow: 0 0 0 3px rgba(92,222,122,.2);
+      animation: pulse 2.4s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%,100% { box-shadow: 0 0 0 3px rgba(92,222,122,.2); }
+      50%      { box-shadow: 0 0 0 6px rgba(92,222,122,.0); }
+    }
+
+    /* ========= QUICK CHIPS ========= */
+    .chips-bar {
+      display: flex; gap: 8px;
+      padding: 12px 18px 10px;
+      overflow-x: auto; flex-shrink: 0;
+      background: var(--parchment);
+      border-bottom: 1px solid rgba(44,26,14,.07);
+      scrollbar-width: none;
+    }
+    .chips-bar::-webkit-scrollbar { display: none; }
+    .chip {
+      flex-shrink: 0;
+      padding: 6px 14px;
+      border-radius: 99px;
+      border: 1.5px solid rgba(92,61,46,.2);
+      background: transparent;
+      font-family: 'DM Sans', sans-serif;
+      font-size: .78rem; font-weight: 500;
+      color: var(--mocha);
+      cursor: pointer;
+      transition: all .18s ease;
+      white-space: nowrap;
+    }
+    .chip:hover {
+      background: var(--espresso);
+      border-color: var(--espresso);
+      color: var(--gold);
+      transform: translateY(-1px);
+    }
+
+    /* ========= MESSAGES ========= */
+    .messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px 18px 8px;
+      display: flex; flex-direction: column; gap: 14px;
+      scroll-behavior: smooth;
+    }
+    .messages::-webkit-scrollbar { width: 4px; }
+    .messages::-webkit-scrollbar-track { background: transparent; }
+    .messages::-webkit-scrollbar-thumb {
+      background: rgba(92,61,46,.2); border-radius: 99px;
+    }
+
+    /* date divider */
+    .divider {
+      text-align: center; font-size: .68rem; color: rgba(92,61,46,.4);
+      letter-spacing: .08em; text-transform: uppercase;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .divider::before, .divider::after {
+      content: ''; flex: 1; height: 1px;
+      background: rgba(92,61,46,.12);
+    }
+
+    /* bubbles */
+    .row {
+      display: flex; align-items: flex-end; gap: 8px;
+      animation: pop .25s cubic-bezier(.34,1.56,.64,1) both;
+    }
+    @keyframes pop {
+      from { opacity: 0; transform: scale(.92) translateY(6px); }
+      to   { opacity: 1; transform: none; }
+    }
+    .row.user { flex-direction: row-reverse; }
+
+    .bot-icon {
+      width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
+      background: linear-gradient(135deg, var(--caramel), var(--gold));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px;
+    }
+
+    .bubble {
+      max-width: 78%;
+      padding: 11px 15px;
+      border-radius: 18px;
+      font-size: .875rem; line-height: 1.55;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .row.bot .bubble {
+      background: var(--parchment);
+      border-bottom-left-radius: 4px;
+      color: var(--espresso);
+      box-shadow: 0 2px 8px var(--shadow);
+      border: 1px solid rgba(200,132,58,.12);
+    }
+    .row.user .bubble {
+      background: var(--espresso);
+      border-bottom-right-radius: 4px;
+      color: var(--gold);
+      box-shadow: 0 2px 8px var(--shadow);
+    }
+
+    /* typing indicator */
+    .typing { display: flex; gap: 5px; align-items: center; padding: 4px 6px; }
+    .typing span {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--caramel); opacity: .5;
+      animation: bounce .9s ease-in-out infinite;
+    }
+    .typing span:nth-child(2) { animation-delay: .15s; }
+    .typing span:nth-child(3) { animation-delay: .3s; }
+    @keyframes bounce {
+      0%,60%,100% { transform: translateY(0); opacity: .5; }
+      30%          { transform: translateY(-5px); opacity: 1; }
+    }
+
+    /* ========= INPUT AREA ========= */
+    .input-area {
+      padding: 12px 16px 16px;
+      background: var(--foam);
+      border-top: 1px solid rgba(44,26,14,.07);
+      display: flex; gap: 10px; align-items: flex-end;
+      flex-shrink: 0;
+    }
+    textarea {
+      flex: 1;
+      resize: none;
+      border: 1.5px solid rgba(92,61,46,.2);
+      border-radius: 14px;
+      padding: 10px 14px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: .875rem; color: var(--espresso);
+      background: var(--parchment);
+      outline: none;
+      transition: border-color .2s;
+      max-height: 110px; min-height: 44px;
+      line-height: 1.45;
+    }
+    textarea::placeholder { color: rgba(92,61,46,.4); }
+    textarea:focus { border-color: var(--caramel); }
+
+    .send-btn {
+      width: 44px; height: 44px; border-radius: 13px; flex-shrink: 0;
+      background: var(--espresso);
+      border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all .18s ease;
+    }
+    .send-btn:hover {
+      background: var(--mocha);
+      transform: scale(1.06);
+      box-shadow: 0 4px 14px rgba(44,26,14,.25);
+    }
+    .send-btn:active { transform: scale(.97); }
+    .send-btn svg { width: 20px; height: 20px; fill: var(--gold); }
+
+    /* ========= EMPTY STATE ========= */
+    .empty {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 10px;
+      color: rgba(92,61,46,.35);
+      pointer-events: none;
+    }
+    .empty .cup { font-size: 3rem; }
+    .empty p { font-family: 'Playfair Display', serif; font-style: italic; font-size: .95rem; }
+  </style>
+</head>
+<body>
+
+<div class="window">
+
+  <!-- HEADER -->
+  <header>
+    <div class="avatar">☕</div>
+    <div class="header-text">
+      <h1>Brewed&Bliss</h1>
+      <p>Your cafe assistant</p>
+    </div>
+    <div class="status-dot"></div>
+  </header>
+
+  <!-- QUICK CHIPS -->
+  <div class="chips-bar">
+    <button class="chip" onclick="sendChip('Hi there!')">👋 Hello</button>
+    <button class="chip" onclick="sendChip('Show me the menu')">📋 Menu</button>
+    <button class="chip" onclick="sendChip('offers')">🎉 Offers</button>
+    <button class="chip" onclick="sendChip('timings')">⏰ Timings</button>
+    <button class="chip" onclick="sendChip('wifi')">📶 WiFi</button>
+  </div>
+
+  <!-- MESSAGES -->
+  <div class="messages" id="messages">
+    <div class="divider">Today</div>
+    <div class="row bot" id="welcome-row">
+      <div class="bot-icon">☕</div>
+      <div class="bubble">
+        Welcome to <strong>Brewed&Bliss</strong>! ☕<br>
+        I'm here to help you explore our menu, find the best deals, and answer anything about our café.<br><br>
+        Type a message or tap a button above to get started!
+      </div>
+    </div>
+  </div>
+
+  <!-- INPUT -->
+  <div class="input-area">
+    <textarea
+      id="input"
+      rows="1"
+      placeholder="Ask about our menu, deals, timings…"
+      onkeydown="handleKey(event)"
+      oninput="autoResize(this)"
+    ></textarea>
+    <button class="send-btn" onclick="sendMessage()" title="Send">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M2.01 21 23 12 2.01 3 2 10l15 2-15 2z"/>
+      </svg>
+    </button>
+  </div>
+
+</div>
+
+<script>
+  const messagesEl = document.getElementById('messages');
+  const inputEl    = document.getElementById('input');
+  const BACKEND    = 'http://localhost:5000';
+
+  function autoResize(el) {
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight, 110) + 'px';
+  }
+
+  function handleKey(e) {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+  }
+
+  function sendChip(text) {
+    inputEl.value = text;
+    sendMessage();
+  }
+
+  function scrollBottom() {
+    messagesEl.scrollTo({ top: messagesEl.scrollHeight, behavior: 'smooth' });
+  }
+
+  function addBubble(text, role) {
+    const row = document.createElement('div');
+    row.className = 'row ' + role;
+    if (role === 'bot') {
+      row.innerHTML = `<div class="bot-icon">☕</div><div class="bubble">${escHtml(text)}</div>`;
+    } else {
+      row.innerHTML = `<div class="bubble">${escHtml(text)}</div>`;
+    }
+    messagesEl.appendChild(row);
+    scrollBottom();
+    return row;
+  }
+
+  function showTyping() {
+    const row = document.createElement('div');
+    row.className = 'row bot'; row.id = 'typing';
+    row.innerHTML = `<div class="bot-icon">☕</div>
+      <div class="bubble"><div class="typing">
+        <span></span><span></span><span></span>
+      </div></div>`;
+    messagesEl.appendChild(row);
+    scrollBottom();
+  }
+
+  function hideTyping() {
+    document.getElementById('typing')?.remove();
+  }
+
+  function escHtml(str) {
+    return str
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+      .replace(/\n/g,'<br>').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>');
+  }
+
+  async function sendMessage() {
+    const text = inputEl.value.trim();
+    if (!text) return;
+    inputEl.value = ''; inputEl.style.height = 'auto';
+
+    addBubble(text, 'user');
+    showTyping();
+
+    try {
+      const res = await fetch(`${BACKEND}/chat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: text })
+      });
+      const data = await res.json();
+      hideTyping();
+      addBubble(data.reply || "I didn't catch that. Could you rephrase?", 'bot');
+    } catch {
+      hideTyping();
+      addBubble("⚠️ Couldn't reach the café server. Make sure the Flask backend is running on port 5000.", 'bot');
+    }
+  }
+</script> 
+</body>
+</html>

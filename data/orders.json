@@ -1,0 +1,59 @@
+[
+  {
+    "order_id": "ORD-72BBB2EB",
+    "timestamp": "2026-03-30 04:34:42",
+    "customer": "Muskan",
+    "table": "7",
+    "items": [
+      {
+        "name": "Cold Coffee",
+        "price": 99,
+        "qty": 1
+      },
+      {
+        "name": "French Fries",
+        "price": 89,
+        "qty": 1
+      }
+    ],
+    "total": 188
+  },
+  {
+    "order_id": "ORD-FE695C55",
+    "timestamp": "2026-03-30 15:01:07",
+    "customer": "Muskan",
+    "table": "2",
+    "items": [
+      {
+        "name": "Cold Coffee",
+        "price": 99,
+        "qty": 1
+      },
+      {
+        "name": "Chocolate Shake",
+        "price": 149,
+        "qty": 1
+      }
+    ],
+    "total": 248
+  },
+  {
+    "order_id": "ORD-2AEB4D3F",
+    "timestamp": "2026-03-30 18:15:18",
+    "customer": "Muskan",
+    "table": "3",
+    "items": [
+      {
+        "name": "Margherita Pizza",
+        "price": 199,
+        "qty": 1
+      },
+      {
+        "name": "Cold Coffee",
+        "price": 99,
+        "qty": 1
+      }
+    ],
+    "total": 298
+  }
+]
